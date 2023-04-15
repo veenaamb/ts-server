@@ -4,12 +4,14 @@ import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 
 @Resolver()
 export class PostResolver {
+
   //read all posts
   @Query(() => [Post]) //graphql type
   posts(@Ctx() { em }: MyContext): Promise<Post[]> {
     //typescript type
     return em.find(Post, {});
   }
+
   //read post for given id - return null otherwise
   @Query(() => Post, { nullable: true }) // graphql return type Post | null return type
   post(
@@ -19,6 +21,7 @@ export class PostResolver {
     //typescript type
     return em.findOne(Post, { id });
   }
+
   //create
   @Mutation(() => Post) // graphql return type Post | null return type
   async createPost(
