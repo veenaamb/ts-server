@@ -34,7 +34,7 @@ export class PostResolver {
     return post;
   }
 
-  //update
+  //update an existing post
   @Mutation(() => Post, { nullable: true }) // graphql return type Post | null return type
   async updatePost(
     @Arg("title", () => String, { nullable: true }) title: string, // ()=> String, {nullable:true} sets the title to string or null as input
@@ -46,7 +46,7 @@ export class PostResolver {
     if (!post) {
       return null;
     }
-    if (typeof title !== "undefined") {
+    if (typeof title !== "undefined") { //title talks about input parameter for the updatepost call here
       //since title can be null
       post.title = title;
       await em.persistAndFlush(post);
