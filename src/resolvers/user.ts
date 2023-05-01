@@ -39,7 +39,7 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-  @Mutation(() => User)
+  @Mutation(() => UserResponse)
   async register(
     @Arg("options", () => UsernamePasswordInput) options: UsernamePasswordInput,
     @Ctx() { em }: MyContext
@@ -66,7 +66,14 @@ export class UserResolver {
     try {
       await em.persistAndFlush(user);
     } catch (err) {
-      console.log("jesus message: ", err.message);
+      if (err.code === '23505' || err.detail.includes("already exists")){
+        return {
+          errors: [{
+            field: "username",
+            message: "username already taken"
+          }]
+        }
+      }
     }
     return { user };
   }
