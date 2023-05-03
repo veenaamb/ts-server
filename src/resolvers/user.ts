@@ -66,13 +66,15 @@ export class UserResolver {
     try {
       await em.persistAndFlush(user);
     } catch (err) {
-      if (err.code === '23505' || err.detail.includes("already exists")){
+      if (err.code === "23505" || err.detail.includes("already exists")) {
         return {
-          errors: [{
-            field: "username",
-            message: "username already taken"
-          }]
-        }
+          errors: [
+            {
+              field: "username",
+              message: "username already taken",
+            },
+          ],
+        };
       }
     }
     return { user };
@@ -81,7 +83,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg("options", () => UsernamePasswordInput) options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
     const user = await em.findOne(User, {
       username: options.username.toLowerCase(),
@@ -105,6 +107,9 @@ export class UserResolver {
         errors: [{ field: "password", message: "incorrect password" }],
       };
     }
+
+    req.session.userId = user.id;
+
     return { user };
   }
 }

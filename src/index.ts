@@ -13,10 +13,11 @@ import * as dotenv from "dotenv";
 import RedisStore from "connect-redis";
 import session from "express-session";
 import { createClient } from "redis";
+import { MyContext } from "./types";
 
 const main = async () => {
   dotenv.config();
-  // console.log("printing process env ", process.env); 
+  // console.log("printing process env ", process.env);
 
   const orm = await MikroORM.init(microConfig);
   const emFork = orm.em.fork(); // create the fork of new EntityManager instance
@@ -52,7 +53,7 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, //10 years,
         httpOnly: true,
         secure: __prod__, //cookie only works in https in prod
-        sameSite: "lax",
+        sameSite: "lax", //csrf
       },
       secret: session_key,
     })
@@ -64,7 +65,7 @@ const main = async () => {
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: () => ({ em: emFork }),
+    context: ({ req, res }): MyContext => ({ em: emFork, req, res }),
   });
 
   //create graphql endpoint on express
